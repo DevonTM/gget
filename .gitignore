@@ -1,0 +1,4 @@
+.vscode/
+.golangci.yml
+gget*
+release/
