@@ -76,7 +76,6 @@ gget -C cookies.txt https://example.com/file.zip
 ## TODO
 
 - [ ] Add tests
-- [ ] Support user/password for proxy
 - [ ] Better error messages
 
 ## License

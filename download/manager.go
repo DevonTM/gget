@@ -2,18 +2,16 @@ package download
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 )
 
 type Info struct {
-	URL         string
-	Path        string
-	Header      map[string]string
-	CookiesFile string
-	FileName    string
-	FileSize    int64
+	URL      string
+	Path     string
+	Header   map[string]string
+	FileName string
+	FileSize int64
 }
 
 type Setting struct {
@@ -33,7 +31,7 @@ func (d *Info) Manager(s *Setting) error {
 	defer resp.Body.Close()
 
 	// check http status code
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != 200 {
 		return fmt.Errorf("error: %s", resp.Status)
 	}
 
@@ -81,14 +79,11 @@ func (d *Info) Manager(s *Setting) error {
 	// check if server accept ranges, else download without concurrency and resume
 	if resp.ContentLength > 0 && resp.Header.Get("Accept-Ranges") == "bytes" {
 		err = d.WithRange(s)
-		if err != nil {
-			return err
-		}
 	} else {
 		err = d.WithoutRange()
-		if err != nil {
-			return err
-		}
+	}
+	if err != nil {
+		return err
 	}
 
 	return nil

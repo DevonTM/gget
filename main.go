@@ -85,13 +85,20 @@ func main() {
 		return
 	}
 
-	if *proxy != "" {
-		proxyURL, _ := url.Parse(*proxy)
-		if proxyURL.Scheme != "http" && proxyURL.Scheme != "https" && proxyURL.Scheme != "socks5" {
-			fmt.Println("only http, https, and socks5 proxy supported")
+	if *cookies != "" {
+		err = download.SetCookies(*cookies)
+		if err != nil {
+			fmt.Println(err)
 			return
 		}
-		download.SetProxy(proxyURL)
+	}
+
+	if *proxy != "" {
+		err = download.SetProxy(*proxy)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 
 	if *thread < 1 || *thread > 16 {
@@ -143,11 +150,10 @@ func main() {
 	}
 
 	d := &download.Info{
-		URL:         *urlPath,
-		Path:        paths,
-		Header:      header,
-		CookiesFile: *cookies,
-		FileName:    fileName,
+		URL:      *urlPath,
+		Path:     paths,
+		Header:   header,
+		FileName: fileName,
 	}
 
 	err = d.Manager(s)

@@ -1,6 +1,7 @@
 package download
 
 import (
+	"fmt"
 	"mime"
 	"net/http"
 	"net/url"
@@ -17,11 +18,29 @@ var (
 	client = &http.Client{
 		Transport: transport,
 	}
+
+	cookies []*http.Cookie
 )
 
 // set http client transport proxy
-func SetProxy(p *url.URL) {
-	transport.Proxy = http.ProxyURL(p)
+func SetProxy(p string) error {
+	URL, err := url.Parse(p)
+	if err != nil {
+		return err
+	}
+
+	if URL.Scheme != "http" && URL.Scheme != "https" && URL.Scheme != "socks5" {
+		return fmt.Errorf("only http, https and socks5 proxy are supported")
+	}
+
+	transport.Proxy = http.ProxyURL(URL)
+	return nil
+}
+
+// set cookies from netscape cookies file
+func SetCookies(f string) (err error) {
+	cookies, err = cookie.ParseFile(f)
+	return
 }
 
 // send http request and return http response
@@ -36,12 +55,7 @@ func (d *Info) getResponse(ranges ...string) (*http.Response, error) {
 		req.Header.Set(key, value)
 	}
 
-	if d.CookiesFile != "" {
-		var cookies []*http.Cookie
-		cookies, err = cookie.ParseFile(d.CookiesFile)
-		if err != nil {
-			return nil, err
-		}
+	if len(cookies) > 0 {
 		for _, cookie := range cookies {
 			req.AddCookie(cookie)
 		}
@@ -90,13 +104,13 @@ func getFileName(resp *http.Response) string {
 // get filename from url
 func getFileNameFromURL(u string) (string, error) {
 	// parse url
-	parsedURL, err := url.Parse(u)
+	URL, err := url.Parse(u)
 	if err != nil {
 		return "", err
 	}
 
 	// get unescaped path
-	path, err := url.QueryUnescape(parsedURL.EscapedPath())
+	path, err := url.QueryUnescape(URL.EscapedPath())
 	if err != nil {
 		return "", err
 	}
