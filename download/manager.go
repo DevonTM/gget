@@ -11,7 +11,7 @@ type Info struct {
 	Path     string
 	Header   map[string]string
 	FileName string
-	FileSize int64
+	fileSize int64
 }
 
 type Setting struct {
@@ -41,7 +41,7 @@ func (d *Info) Manager(s *Setting) error {
 	}
 
 	// set file size from http response
-	d.FileSize = resp.ContentLength
+	d.fileSize = resp.ContentLength
 
 	// set file name if not set
 	if d.FileName == "" {

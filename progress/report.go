@@ -16,17 +16,17 @@ type Report struct {
 	Total   int64 // total file size
 	Current int64 // current file size
 	written int64 // current written bytes
-	Mutex   sync.Mutex
+	mutex   sync.Mutex
 }
 
 // monitor written bytes
 func (pr *Report) Write(p []byte) (int, error) {
 	n := len(p)
 
-	pr.Mutex.Lock()
+	pr.mutex.Lock()
 	pr.Current += int64(n)
 	pr.written += int64(n)
-	pr.Mutex.Unlock()
+	pr.mutex.Unlock()
 
 	return n, nil
 }

@@ -15,7 +15,7 @@ import (
 // download file with concurrent chunk and resume capability
 func (d *Info) WithRange(s *Setting) error {
 	// check if server support specified range
-	resp, err := d.getResponse(fmt.Sprintf("bytes=0-%d", d.FileSize))
+	resp, err := d.getResponse(fmt.Sprintf("bytes=0-%d", d.fileSize))
 	if err != nil {
 		return err
 	}
@@ -25,12 +25,12 @@ func (d *Info) WithRange(s *Setting) error {
 	}
 
 	pd := &progress.Data{
-		FileSize:  d.FileSize,
+		FileSize:  d.fileSize,
 		ChunkSize: s.ChunkSize,
 	}
 
 	pr := &progress.Report{
-		Total: d.FileSize,
+		Total: d.fileSize,
 	}
 
 	done := make(chan struct{})
@@ -120,7 +120,7 @@ func (d *Info) WithRange(s *Setting) error {
 			start := int64(index) * pd.ChunkSize
 			end := start + pd.ChunkSize - 1
 			if index == len(pd.Chunk)-1 {
-				end = d.FileSize
+				end = d.fileSize
 			}
 
 			resp, errr := d.getResponse(fmt.Sprintf("bytes=%d-%d", start, end))

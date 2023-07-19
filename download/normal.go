@@ -23,7 +23,7 @@ func (d *Info) WithoutRange() error {
 	defer resp.Body.Close()
 
 	pr := &progress.Report{
-		Total: d.FileSize,
+		Total: d.fileSize,
 	}
 
 	done := make(chan struct{}, 1)
